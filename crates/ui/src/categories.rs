@@ -579,8 +579,19 @@ impl MessagingUi {
 			ui.label(RichText::new(language.text("no-conversations")).color(colors.muted));
 		}
 		let dm_list = self.guild.is_none();
-		let row_height = if dm_list { 44.0 } else { 34.0 };
+		let row_height = if dm_list { 44.0 } else { 32.0 };
 		let row_count = self.channel_cache.rows.len().max(usize::from(dm_list));
+		// Categories need breathing room above the label without stretching channels.
+		let mut offsets = Vec::with_capacity(row_count + 1);
+		offsets.push(0.0);
+		for index in 0..row_count {
+			let height = match self.channel_cache.rows.get(index) {
+				Some(CachedRow::Category(..)) if !dm_list => 48.0,
+				Some(CachedRow::Participant(..)) => 34.0,
+				_ => row_height,
+			};
+			offsets.push(offsets[index] + height);
+		}
 		let previous_spacing = ui.spacing().item_spacing.y;
 		ui.spacing_mut().item_spacing.y = 0.0;
 		let mut drop_rows = Vec::new();
@@ -591,8 +602,18 @@ impl MessagingUi {
 				("channel-list", self.guild),
 				egui::ScrollArea::vertical().auto_shrink([false, false]),
 			)
-			.show_rows(ui, row_height, row_count, |ui, range| {
-				for index in range {
+			.show_viewport(ui, |ui, viewport| {
+				ui.set_min_height(offsets[row_count]);
+				let start = offsets
+					.partition_point(|y| *y <= viewport.min.y)
+					.saturating_sub(1);
+				let end = offsets
+					.partition_point(|y| *y < viewport.max.y)
+					.min(row_count);
+				ui.add_space(offsets[start]);
+				ui.skip_ahead_auto_ids(start);
+				for index in start..end {
+					let row_height = offsets[index + 1] - offsets[index];
 					let Some(row) = self.channel_cache.rows.get(index).copied() else {
 						ui.label(
 							RichText::new(language.text("no-conversations")).color(colors.muted),
@@ -1773,7 +1794,7 @@ mod tests {
 	}
 
 	#[test]
-	fn channel_rows_scroll_continuously_past_voice_participants() {
+	fn channel_rows_scroll_continuously_past_categories_and_voice_participants() {
 		let mut state = test_support::demo_state();
 		state.guilds = vec![model::Guild {
 			default_message_notifications: None,
@@ -1793,6 +1814,10 @@ mod tests {
 				)
 			})
 			.collect();
+		for channel in &mut state.channels {
+			channel.parent_id = Some(Id(500));
+		}
+		state.channels.insert(0, channel(500, 4, 0, None));
 		state
 			.permissions
 			.replace(test_support::permission_snapshot(&state))

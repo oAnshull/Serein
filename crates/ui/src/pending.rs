@@ -69,7 +69,7 @@ pub fn show(
 			bottom: 1,
 		})
 		.show(ui, |ui| {
-			ui.spacing_mut().item_spacing = egui::vec2(16.0, 4.0);
+			ui.spacing_mut().item_spacing = egui::vec2(16.0, if irc { 2.0 } else { 0.0 });
 			ui.horizontal_top(|ui| {
 				if irc {
 					// Match a compact timeline row: a time-wide slot, the author, then the body.
@@ -153,6 +153,7 @@ pub fn show(
 							));
 						});
 					}
+					ui.spacing_mut().item_spacing.y = if irc { 2.0 } else { 4.0 };
 					if !pending.content.is_empty() {
 						ui.scope(|ui| {
 							ui.set_opacity(0.55);

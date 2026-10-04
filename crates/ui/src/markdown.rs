@@ -2220,6 +2220,8 @@ impl Formatted {
 			};
 		TextFormat {
 			valign: ui.text_valign(),
+			// Keep wrapped prose and explicit newlines on the same message rhythm.
+			line_height: Some(crate::timeline::MESSAGE_LINE * size / 15.0),
 			font_id: if style.code {
 				FontId::monospace(size)
 			} else if style.strong || style.mass_mention {
@@ -2255,6 +2257,38 @@ impl Formatted {
 #[cfg(test)]
 mod tests {
 	use super::*;
+
+	#[test]
+	fn message_prose_keeps_line_spacing_when_wrapped_or_broken() {
+		for dark in [false, true] {
+			let ctx = egui::Context::default();
+			crate::design::apply(&ctx);
+			ctx.set_theme(if dark {
+				egui::Theme::Dark
+			} else {
+				egui::Theme::Light
+			});
+			let output = ctx.run_ui(egui::RawInput::default(), |ui| {
+				let font = egui::TextStyle::Body.resolve(ui.style());
+				let mut job = LayoutJob::default();
+				job.wrap.max_width = 140.0;
+				job.append(
+					"Wrapped message text with several words\nSecond line\nThird line",
+					0.0,
+					Formatted::format(ui, &Style::default()),
+				);
+				let galley = ui.fonts_mut(|fonts| fonts.layout_job(job));
+				assert!(galley.rows.len() >= 4);
+				assert_eq!(galley.job.sections[0].format.font_id.size, font.size);
+				for pair in galley.rows.windows(2) {
+					assert!(
+						(pair[1].pos.y - pair[0].pos.y - crate::timeline::MESSAGE_LINE).abs() < 0.1
+					);
+				}
+			});
+			output.drop_without_applying_deltas();
+		}
+	}
 
 	#[test]
 	fn bidi_runs_keep_each_script_logical_and_follow_paragraph_direction() {
