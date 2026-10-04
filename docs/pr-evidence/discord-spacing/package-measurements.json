@@ -1,0 +1,28 @@
+{
+  "platform": "Windows x86_64 MSVC",
+  "rustc": "1.98.1 (48a229cea 2026-09-01)",
+  "build_command": "cargo xtask package",
+  "desktop_build_command": "cargo build --release --locked -p serein --no-default-features",
+  "voice": "Included as an unconditional dependency in both builds",
+  "samples_per_revision": 1,
+  "package_method": "Sum of file lengths in the standard portable dist directory",
+  "zip_method": "Python 3.11 zipfile, ZIP_DEFLATED, compresslevel=9, sorted relative paths",
+  "baseline": {
+    "source_commit": "6313e271",
+    "executable_bytes": 84442112,
+    "package_bytes": 88615308,
+    "zip_deflate9_bytes": 49283317,
+    "package_files": 213,
+    "executable_sha256": "bbcd21f4e7ccbab40b4b2062fd1e11004743873b6764356fbc5b03b2c5c61b63"
+  },
+  "after": {
+    "source_commit": "599f1413",
+    "executable_bytes": 84441600,
+    "package_bytes": 88614796,
+    "zip_deflate9_bytes": 49282937,
+    "package_files": 213,
+    "executable_sha256": "f2a249652fdff497336432b744a1a11cc4d666afd4648b0f54156aa2d9c0c497"
+  },
+  "installer": "NSIS unavailable; existing packaging command skipped installer binary creation",
+  "native_performance": "Unmeasured: native capture/control unavailable. No idle CPU, RSS, frame or startup latency claim."
+}
