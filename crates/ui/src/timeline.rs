@@ -357,7 +357,7 @@ const GROUPED_ROW_SAVINGS: f32 = 52.0;
 
 /// Space above a new message group: cozy by default, tighter when compact spacing is on.
 pub(crate) fn group_gap(compact_messages: bool) -> i8 {
-	if compact_messages { 4 } else { 10 }
+	if compact_messages { 4 } else { 16 }
 }
 
 fn reserved_chrome(ui: &egui::Ui, message: &Message, width: f32) -> f32 {
@@ -1721,7 +1721,7 @@ impl TimelineView {
 					}) + crate::attachments::estimated_height(
 						&m.attachments,
 						(width - 88.0).max(1.0),
-					) + 58.0 + 18.0 * lines.min(128.0);
+					) + 64.0 + MESSAGE_LINE * lines.min(128.0);
 					if self.compact_messages || grouped(prior, m, self.unread_boundary) {
 						estimate = (estimate - GROUPED_ROW_SAVINGS).max(24.0);
 					}
@@ -2189,7 +2189,7 @@ impl TimelineView {
 						.show(ui, |ui| {
 							let mut surface = crate::select::Surface::new(ui, "row");
 							ui.spacing_mut().item_spacing =
-								egui::vec2(16.0, if self.compact_messages { 2.0 } else { 4.0 });
+								egui::vec2(16.0, if self.compact_messages { 2.0 } else { 0.0 });
 							if let Some(interaction) = message
 								.interaction
 								.as_deref()
@@ -2668,6 +2668,9 @@ impl TimelineView {
 											),
 										);
 									}
+									// The author has no extra gap; content cards keep their own spacing.
+									ui.spacing_mut().item_spacing.y =
+										if self.compact_messages { 2.0 } else { 4.0 };
 									let body = egui::Frame::NONE
 										.inner_margin(egui::Margin {
 											left: if message.forwarded { 16 } else { 0 },
@@ -4609,6 +4612,19 @@ mod tests {
 						"authors {names:?}, body {body:?}"
 					);
 				}
+			} else {
+				let (_, author) = labels
+					.iter()
+					.find(|(text, _)| text == "Synthetic compact speaker")
+					.unwrap();
+				let (_, body) = labels
+					.iter()
+					.find(|(text, _)| text == "Compact body 20")
+					.unwrap();
+				assert!(
+					(0.0..=4.0).contains(&(body.top() - author.bottom())),
+					"cozy author and body should be adjacent: {author:?}, {body:?}"
+				);
 			}
 			heights.push(view.rows.iter().map(|(_, height)| height).sum::<f32>());
 		}

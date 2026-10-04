@@ -4207,3 +4207,25 @@ three sources, 220/560/1260-point widths, light/dark themes and scales 1/2.
 The exact announcement failed on the baseline because the following text began
 at y=76 while its quote rail extended to y=216; explicit row boundaries pass.
 `cargo xtask check` and strict Clippy for the demo preview passed.
+
+## Message and channel spacing package footprint, October 4, 2026
+
+Compared baseline `6313e271` with spacing source `599f1413` on Windows x86_64
+MSVC, using pinned Rust 1.98.1 and `cargo xtask package` on each revision.
+Both standard release builds include voice and use no default desktop features.
+One package was measured per revision; the baseline output was retained separately.
+Raw byte counts and executable hashes are in
+[`pr-evidence/discord-spacing/package-measurements.json`](pr-evidence/discord-spacing/package-measurements.json).
+
+| Metric | Baseline | After | Delta |
+| --- | ---: | ---: | ---: |
+| Executable bytes | 84,442,112 | 84,441,600 | -512 (-0.00061%) |
+| Portable package bytes | 88,615,308 | 88,614,796 | -512 (-0.00058%) |
+| ZIP bytes, DEFLATE level 9 | 49,283,317 | 49,282,937 | -380 (-0.00077%) |
+
+Package bytes sum file lengths across 213 files, excluding filesystem allocation
+overhead. ZIP uses Python 3.11 `zipfile` with sorted relative paths. These small
+size differences do not establish a runtime performance improvement. NSIS was
+unavailable, so no installer binary or installed-directory measurement was taken.
+Native capture/control was unavailable; idle CPU, peak/settled RSS, frame/startup
+latency, scrolling interactions and native before/after screenshots are unmeasured.

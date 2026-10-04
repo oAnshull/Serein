@@ -82,7 +82,7 @@ The bundled faces remain upstream's hinted TrueType builds. See `assets/README.m
 - 72px server rail (`base`): 48px home button and server icons (circle, rounded square when
   hovered/selected), white edge pill (8px unread, 20px hover, 40px selected), red mention badges.
 - The lists and conversation share one rounded surface beside the rail. Channel sidebar
-  (240px default, resizable): 48px header with the server name, category eyebrows with chevrons,
+  (240px default, resizable): 48px header with the server name, 48px category rows with chevrons,
   32px rows with `#`/speaker/forum/thread glyphs, `selected`/`hover` fills, unread edge pill,
   mention badge; DM rows are 44px with 32px avatars. Forum rows open their post archive.
   Account card at the bottom (`raised`, avatar with presence dot, name, status, settings gear).
@@ -92,6 +92,8 @@ The bundled faces remain upstream's hinted TrueType builds. See `assets/README.m
 - Timeline: 16px gutters, 40px avatars, content at 72px, medium-weight author names, 12px muted
   timestamps, `hover` row highlight, date dividers with a centred label, red "New messages"
   divider, floating hover toolbar (react, reply, edit, more) overlapping the row above.
+  Cozy messages use 22px body lines, a 16px gap above each new author group, and no extra
+  gap between the author line and body. Pending messages share these dimensions.
 - Composer: rounded `raised` bar with attach (+), placeholder `Message #channel`, emoji picker
   and send icons; a character counter appears within 200 characters of the limit.
 - Member list (240px): ONLINE/OFFLINE eyebrows with counts; group DMs show a localized
